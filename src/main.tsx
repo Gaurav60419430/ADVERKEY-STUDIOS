@@ -64,10 +64,17 @@ function App() {
   return <main id="top">
     <Header />
     <section className="hero" aria-labelledby="hero-title">
+      <div className="hero-covers" aria-hidden="true">
+        <div className="cover-track cover-track-forward"><i></i><i></i></div>
+        <div className="cover-track cover-track-reverse"><i></i><i></i></div>
+      </div>
       <div className="hero-index">001 / AN INDEPENDENT COMPANY</div>
       <h1 id="hero-title"><span>CREATE.</span><span>BACK.</span><span>BUILD.</span></h1>
       <div className="hero-bottom"><p>Ideas deserve more than one way forward.</p><a href="#create" className="circle-link" aria-label="Begin exploring">↓</a><p className="hero-note">PUBLISHING / INVESTMENT / TECHNOLOGY</p></div>
-      <div className="hero-disc"></div>
+      <div className="hero-disc" aria-hidden="true">
+        <span className="hero-orbit"><i></i></span>
+        <span className="hero-orbit hero-orbit-reverse"><i></i></span>
+      </div>
     </section>
 
     <Reveal className="manifesto" id="about"><p className="eyebrow">WHAT WE'RE HERE FOR</p><div><h2>We make room for<br/><i>what could be.</i></h2><p className="intro">Adverkey Studios is a home for stories, ambitious people, and useful technology. We work where imagination becomes something real.</p></div></Reveal>
