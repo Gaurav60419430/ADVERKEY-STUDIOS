@@ -1,0 +1,18 @@
+.aryabhata-field{background:#172b46;isolation:isolate;transform:translateZ(0)}
+.aryabhata-field img{position:absolute;inset:4% 5%;width:90%;height:92%;object-fit:cover;object-position:center;filter:grayscale(.62) saturate(.42) contrast(1.16) sepia(.1) brightness(.96);transform:translate(calc(var(--pointer-x, 0) * 8px),calc(var(--pointer-y, 0) * 8px)) scale(1.04);transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.aryabhata-field:after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(8,22,42,.2),transparent 48%,rgba(220,174,103,.18));mix-blend-mode:multiply;pointer-events:none}
+.aryabhata-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(240,240,232,.8) .7px,transparent 1.25px);background-size:4px 4px;mix-blend-mode:screen;opacity:.34;transform:translate(calc(var(--pointer-x, 0) * -5px),calc(var(--pointer-y, 0) * -5px)) skew(.25deg,-.2deg);animation:aryabhata-drift 12s linear infinite;pointer-events:none}
+.aryabhata-scan{position:absolute;inset:-20% 0;background:linear-gradient(180deg,transparent 42%,rgba(208,229,224,.18) 50%,transparent 58%);transform:translateY(-55%);animation:aryabhata-scan 7s ease-in-out infinite;mix-blend-mode:screen;pointer-events:none}
+.aryabhata-eye{position:absolute;z-index:2;top:27%;width:7px;height:7px;border-radius:50%;background:#ef3d31;opacity:.18;box-shadow:0 0 0 2px #ef3d3122;transition:opacity .2s,box-shadow .2s,transform .2s;pointer-events:none}
+.aryabhata-eye-left{left:40%}.aryabhata-eye-right{left:53%}
+.aryabhata-eye:after{content:'';position:absolute;top:50%;width:48%;height:1px;background:linear-gradient(90deg,#ef3d31cc,transparent);opacity:0;transition:width .2s,opacity .2s,box-shadow .2s}
+.aryabhata-eye-left:after{right:100%;transform:rotate(2deg) scaleX(-1);transform-origin:right center}.aryabhata-eye-right:after{left:100%;transform:rotate(-2deg);transform-origin:left center}
+.aryabhata-field .field-label{color:#f1efe9;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+@keyframes aryabhata-breathe{from{transform:translate(calc(var(--pointer-x, 0) * 8px),calc(var(--pointer-y, 0) * 8px)) scale(1.04) skew(-.4deg,.3deg) rotate(-.25deg)}to{transform:translate(calc(var(--pointer-x, 0) * 8px),calc(var(--pointer-y, 0) * 8px - 5px)) scale(1.08) skew(.4deg,-.3deg) rotate(.25deg)}}
+@keyframes aryabhata-drift{from{background-position:0 0}to{background-position:28px 14px}}
+@keyframes aryabhata-scan{0%,100%{transform:translateY(-55%);opacity:0}25%,75%{opacity:.8}50%{transform:translateY(55%);opacity:.35}}
+@keyframes aryabhata-eye-pulse{0%,100%{opacity:.55;transform:scale(.8)}50%{opacity:1;transform:scale(1.25)}}
+.aryabhata-field:hover .aryabhata-eye,.aryabhata-field.is-armed .aryabhata-eye{opacity:1;transform:scale(1.35);box-shadow:0 0 0 4px #ef3d3155,0 0 22px 8px #ef3d31cc;animation:aryabhata-eye-pulse .7s ease-in-out infinite}
+.aryabhata-field:hover .aryabhata-eye:after,.aryabhata-field.is-armed .aryabhata-eye:after{width:72%;background:linear-gradient(90deg,#ff5a4d,transparent);opacity:1;box-shadow:0 0 8px #ef3d31}
+@media (max-width:700px){.aryabhata-field{aspect-ratio:.9}.aryabhata-field img{object-position:56% center}.aryabhata-dots{background-size:6px 6px;opacity:.3}}
+@media (prefers-reduced-motion:reduce){.aryabhata-field img,.aryabhata-dots,.aryabhata-scan,.aryabhata-eye{animation:none;transform:none}.aryabhata-scan{display:none}.aryabhata-eye{opacity:.8}}

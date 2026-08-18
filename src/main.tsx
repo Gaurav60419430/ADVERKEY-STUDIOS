@@ -1,16 +1,25 @@
-import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
+import './iks.css'
+import './book-pages.css'
+import './aryabhata.css'
+import iitKanpurLogo from './assets/iit-kanpur-logo.png'
+import manitBhopalLogo from './assets/manit-bhopal-logo.png'
 
 const stages = [
-  ['01', 'IDEA', 'A small question with room to grow.'],
-  ['02', 'WRITE', 'A voice, a world, a beginning.'],
-  ['03', 'CREATE', 'Words meet colour and character.'],
-  ['04', 'PRODUCE', 'Care, craft, and a physical object.'],
-  ['05', 'PUBLISH', 'A story ready to find its reader.'],
+  ['01', 'SOURCE', 'Research papers, texts, and knowledge traditions.'],
+  ['02', 'VERIFY', 'Academic review, source checking, and editorial care.'],
+  ['03', 'TRANSLATE', 'Complex ideas made clear and age-appropriate.'],
+  ['04', 'DESIGN', 'Illustration, structure, and visual learning.'],
+  ['05', 'PUBLISH', 'Books for classrooms, homes, and independent reading.'],
 ]
 
 function Arrow() { return <span className="arrow" aria-hidden="true">↗</span> }
+
+function HeroBook() {
+  return <div className="hero-book hero-book--closed" aria-hidden="true"><div className="hero-book-cover hero-book-cover-back"></div><div className="hero-book-pages"><i className="page-spread page-spread-1"><span className="page-kicker">01 / GANITA</span><b>0 · 1 · 1 · 2</b><em className="page-diagram page-orbit"></em><small>THE LANGUAGE OF PATTERNS</small></i><i className="page-spread page-spread-2"><span className="page-kicker">02 / AKASHA</span><b>✦</b><em className="page-diagram page-constellation"></em><small>READING THE NIGHT SKY</small></i><i className="page-spread page-spread-3"><span className="page-kicker">03 / BHUMI</span><b>△</b><em className="page-diagram page-map"></em><small>LAND, WATER, MEMORY</small></i><i className="page-spread page-spread-4"><span className="page-kicker">04 / SHABDA</span><b>ॐ</b><em className="page-diagram page-lines"></em><small>WORDS THAT TRAVEL</small></i><i className="page-spread page-spread-5"><span className="page-kicker">05 / KALA</span><b>✺</b><em className="page-diagram page-grid"></em><small>FORM, RHYTHM, MAKING</small></i></div><div className="hero-book-cover hero-book-cover-front"><span>IKS</span><b>READ<br/>INDIA</b><small>ADVERKEY PRESS</small></div></div>
+}
 
 function Reveal({ children, className = '', id }: { children: ReactNode, className?: string, id?: string }) {
   const ref = useRef<HTMLElement>(null)
@@ -31,9 +40,9 @@ function Header() {
   return <header className="header">
     <a className="wordmark" href="#top" aria-label="Adverkey Studios home">ADVERKEY<span>STUDIOS</span></a>
     <nav className={open ? 'nav open' : 'nav'} aria-label="Primary navigation">
-      <a onClick={() => setOpen(false)} href="#create">CREATE</a><a onClick={() => setOpen(false)} href="#back">BACK</a><a onClick={() => setOpen(false)} href="#build">BUILD</a><a onClick={() => setOpen(false)} href="#about">ABOUT</a>
+      <a onClick={() => setOpen(false)} href="#about">ABOUT</a><a onClick={() => setOpen(false)} href="#books">BOOKS</a><a onClick={() => setOpen(false)} href="#method">METHOD</a><a onClick={() => setOpen(false)} href="#trust">TRUST</a>
     </nav>
-    <a className="contact-link" href="#contact">LET'S TALK <Arrow /></a>
+    <a className="contact-link" href="#contact">PUBLISH WITH US <Arrow /></a>
     <button className="menu" onClick={() => setOpen(!open)} aria-label="Toggle navigation" aria-expanded={open}><i></i><i></i></button>
   </header>
 }
@@ -42,24 +51,25 @@ function Book() {
   const [active, setActive] = useState(false)
   return <button className={'book-wrap ' + (active ? 'book-active' : '')} onClick={() => setActive(!active)} aria-label="Reveal book details">
     <div className="book" aria-hidden="true"><div className="book-spine"></div><div className="book-cover"><span className="sun">✺</span><em>THE</em><strong>LONG<br/>WAY<br/>HOME</strong><small>AN ORIGINAL STORY</small></div></div>
-    <span className="book-hint">{active ? 'A STORY FOR THE ROAD' : 'EXPLORE THE BOOK'} <Arrow /></span>
+    <span className="book-hint">{active ? 'A RESEARCH-LED READING JOURNEY' : 'EXPLORE A BOOK'} <Arrow /></span>
   </button>
 }
 
 function BuildField() {
   const field = useRef<HTMLDivElement>(null)
+  const [armed, setArmed] = useState(false)
   const move = (event: React.PointerEvent<HTMLDivElement>) => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !field.current) return
     const bounds = field.current.getBoundingClientRect()
     field.current.style.setProperty('--pointer-x', `${((event.clientX - bounds.left) / bounds.width - .5) * 2}`)
     field.current.style.setProperty('--pointer-y', `${((event.clientY - bounds.top) / bounds.height - .5) * 2}`)
   }
-  return <div ref={field} className="field" onPointerMove={move} onPointerLeave={() => { field.current?.style.setProperty('--pointer-x', '0'); field.current?.style.setProperty('--pointer-y', '0') }} aria-label="An abstract system that responds to pointer movement"><div className="field-label">A SYSTEM IS ONLY AS GOOD AS<br/>THE QUESTION IT HELPS ANSWER.</div>{Array.from({length: 16}).map((_,i) => <i key={i} style={{'--x': `${(i%4)*31+4}%`, '--y': `${Math.floor(i/4)*29+7}%`, '--depth': `${(i % 3 + 1) * 7}px`} as CSSProperties}></i>)}</div>
+  return <div ref={field} className={`field aryabhata-field${armed ? ' is-armed' : ''}`} onClick={() => setArmed(!armed)} onPointerMove={move} onPointerLeave={() => { field.current?.style.setProperty('--pointer-x', '0'); field.current?.style.setProperty('--pointer-y', '0') }} aria-label="Animated halftone portrait of Aryabhata, an Indian mathematician and astronomer. Point at or click the portrait to trigger the red eyes."><img src="/aryabhata.jpg" alt="Aryabhata surrounded by the Sun, Earth, and stars" /><span className="aryabhata-scan" aria-hidden="true"></span><span className="aryabhata-eye aryabhata-eye-left" aria-hidden="true"></span><span className="aryabhata-eye aryabhata-eye-right" aria-hidden="true"></span><span className="aryabhata-dots" aria-hidden="true"></span><div className="field-label">ARYABHATA / MATHEMATICS,<br/>ASTRONOMY, AND THE SKY</div></div>
 }
 
 function App() {
   const [stage, setStage] = useState(0)
-  const [topic, setTopic] = useState('CREATE')
+  const [topic, setTopic] = useState('PUBLISH A BOOK')
   useEffect(() => { document.documentElement.style.setProperty('--stage', String(stage)) }, [stage])
   return <main id="top">
     <Header />
@@ -68,31 +78,29 @@ function App() {
         <div className="cover-track cover-track-forward"><i></i><i></i></div>
         <div className="cover-track cover-track-reverse"><i></i><i></i></div>
       </div>
-      <div className="hero-index">001 / AN INDEPENDENT COMPANY</div>
-      <h1 id="hero-title"><span>CREATE.</span><span>BACK.</span><span>BUILD.</span></h1>
-      <div className="hero-bottom"><p>Ideas deserve more than one way forward.</p><a href="#create" className="circle-link" aria-label="Begin exploring">↓</a><p className="hero-note">PUBLISHING / INVESTMENT / TECHNOLOGY</p></div>
-      <div className="hero-disc" aria-hidden="true">
-        <span className="hero-orbit"><i></i></span>
-        <span className="hero-orbit hero-orbit-reverse"><i></i></span>
-      </div>
+      <div className="hero-index">001 / RESEARCH-LED PUBLISHING</div>
+      <h1 id="hero-title"><span>LEARN</span><span>FROM OUR</span><span>ROOTS.</span></h1>
+      <div className="hero-bottom"><p>Adverkey Studios turns research, scholarship, and living traditions into books for the next generation.</p><a href="#books" className="circle-link" aria-label="Explore our books">↓</a><p className="hero-note">IKS / RESEARCH / LEARNING</p></div>
+      <HeroBook />
     </section>
 
-    <Reveal className="manifesto" id="about"><p className="eyebrow">WHAT WE'RE HERE FOR</p><div><h2>We make room for<br/><i>what could be.</i></h2><p className="intro">Adverkey Studios is a home for stories, ambitious people, and useful technology. We work where imagination becomes something real.</p></div></Reveal>
+    <Reveal className="manifesto" id="about"><p className="eyebrow">WHAT WE DO</p><div><h2>Traditional<br/><i>knowledge made alive again.</i></h2><p className="intro">Adverkey Studios works with trusted authors and researchers to turn research papers, traditional texts, academic work, and cultural knowledge into accessible books for a new generation of readers.</p></div></Reveal>
 
-    <Reveal className="chapter create" id="create">
-      <div className="chapter-heading"><p className="eyebrow">01 / CREATE</p><p>CHILDREN'S PUBLISHING</p></div>
-      <div className="create-main"><div><h2>Stories for<br/><i>curious minds.</i></h2><p>We shape books from their first flicker of an idea to the moment they are held, read, and passed on.</p><a className="text-link" href="#process">HOW WE MAKE BOOKS <Arrow /></a></div><Book /></div>
-      <div className="marquee"><span>WORDS CAN CHANGE THE WEATHER</span><span>WORDS CAN CHANGE THE WEATHER</span></div>
+    <Reveal className="chapter create" id="books">
+      <div className="chapter-heading"><p className="eyebrow">01 / OUR READERS</p><p>BOOKS FOR EVERY AGE</p></div>
+      <div className="create-main"><div><h2>Books for<br/><i>curious minds.</i></h2><p>We make books that help young readers discover where ideas come from—and where they can go next. We edit, translate, design, and publish knowledge in forms people can read, enjoy, and remember.</p><a className="text-link" href="#method">HOW WE MAKE BOOKS <Arrow /></a></div><Book /></div>
+      <div className="audiences"><div><b>01</b><strong>CHILDREN</strong><span>Illustrated, story-led introductions to Indian ideas and traditions.</span></div><div><b>02</b><strong>TEENAGERS</strong><span>Context, curiosity, and deeper connections across subjects and time.</span></div><div><b>03</b><strong>COLLEGE</strong><span>Rigorous, accessible learning material for students and independent readers.</span></div></div>
+      <div className="marquee"><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span></div>
     </Reveal>
 
-    <Reveal className="process" id="process"><div className="process-head"><p className="eyebrow">FROM FIRST MARK TO LAST PAGE</p><h2>Making a book<br/>is a <i>way of seeing.</i></h2></div><div className="stages" role="tablist" aria-label="Publishing process">{stages.map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {stages[stage][1]} </span><div className="page page-a"></div><div className="page page-b"></div><div className="ink">{stage === 0 ? '?' : stage === 1 ? 'Once' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
+    <Reveal className="process" id="method"><div className="process-head"><p className="eyebrow">FROM SOURCE TO LAST PAGE</p><h2>Research becomes<br/><i>a reading journey.</i></h2></div><div className="stages" role="tablist" aria-label="Our publishing process">{[['01','SOURCE','Research papers, texts, and knowledge traditions.'],['02','VERIFY','Academic review, source checking, and editorial care.'],['03','TRANSLATE','Complex ideas made clear, vivid, and age-appropriate.'],['04','DESIGN','Illustrations, structure, and visual learning that invite attention.'],['05','PUBLISH','Books made for classrooms, homes, and independent reading.']].map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {['SOURCE','VERIFY','TRANSLATE','DESIGN','PUBLISH'][stage]} </span><div className="page page-a"></div><div className="page page-b"></div><div className="ink">{stage === 0 ? 'ॐ' : stage === 1 ? '∴' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
 
-    <Reveal className="chapter back" id="back"><div className="chapter-heading"><p className="eyebrow">02 / BACK</p><p>INVESTMENT, IN FORMATION</p></div><div className="back-grid"><h2>Back the<br/><i>beginning.</i></h2><div className="back-copy"><p>We are building our approach to investment around people with clear conviction and ideas with a reason to exist.</p><p className="muted">No portfolio theatre. Just a long-term interest in what people are making next.</p><a className="text-link light" href="#contact">START A CONVERSATION <Arrow /></a></div><div className="thesis"><p>WHAT WE LOOK FOR</p>{['A considered point of view','People who stay curious','Useful, enduring work','Ambition with texture'].map((item,i) => <button key={item}><span>0{i+1}</span>{item}<Arrow /></button>)}</div></div></Reveal>
+    <Reveal className="chapter back" id="trust"><div className="chapter-heading"><p className="eyebrow">02 / TRUSTED SOURCES</p><p>ACADEMIC COLLABORATION</p></div><div className="back-grid"><h2>Knowledge with<br/><i>a foundation.</i></h2><div className="back-copy"><p>We work with contributors from academic and research communities, including relationships connected to IIT Kanpur and MANIT Bhopal. Their research and source material help give our books a strong foundation.</p><p className="muted">These institutions represent contributor and research relationships, not an institutional endorsement of Adverkey Studios or its publications.</p><a className="text-link light" href="#contact">COLLABORATE WITH US <Arrow /></a></div><div className="institutions" aria-label="Trusted partners connected to our contributors"><p>TRUSTED PARTNERS</p><div className="institution-mark"><div className="institution-logo"><img src={iitKanpurLogo} alt="IIT Kanpur logo" /></div><span>INDIAN INSTITUTE OF TECHNOLOGY<br/><strong>KANPUR</strong></span></div><div className="institution-mark"><div className="institution-logo"><img src={manitBhopalLogo} alt="MANIT Bhopal logo" /></div><span>MAULANA AZAD NATIONAL INSTITUTE OF TECHNOLOGY<br/><strong>BHOPAL</strong></span></div></div></div></Reveal>
 
-    <Reveal className="chapter build" id="build"><div className="chapter-heading"><p className="eyebrow">03 / BUILD</p><p>TECHNOLOGY & MACHINE LEARNING</p></div><div className="build-grid"><div><h2>Intelligence,<br/><i>made useful.</i></h2><p>We are developing a technology practice for teams working through consequential questions.</p><a className="text-link" href="#contact">BUILD WITH US <Arrow /></a></div><BuildField /></div></Reveal>
+    <Reveal className="chapter build" id="iks"><div className="chapter-heading"><p className="eyebrow">03 / WHY IKS</p><p>IDEAS THAT STILL SPEAK</p></div><div className="build-grid"><div><h2>Old wisdom,<br/><i>new questions.</i></h2><p>Indian Knowledge Systems are the many ways people in India have studied, understood, recorded, and passed on knowledge across generations. Our books explore mathematics, astronomy, ecology, medicine, philosophy, literature, architecture, and the arts.</p><a className="text-link" href="#contact">EXPLORE A TOPIC <Arrow /></a></div><BuildField /></div></Reveal>
 
-    <Reveal className="contact" id="contact"><p className="eyebrow">A GOOD PLACE TO START</p><h2>What brings<br/>you <i>here?</i></h2><div className="topic-buttons">{['CREATE','BACK','BUILD','SOMETHING ELSE'].map(x => <button className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><p className="contact-email">CONTACT DETAILS<br/>COMING SOON</p></Reveal>
-    <footer><a className="wordmark" href="#top">ADVERKEY<span>STUDIOS</span></a><p>CREATE. BACK. BUILD.</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer>
+    <Reveal className="contact" id="contact"><p className="eyebrow">A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href="mailto:hello@adverkey.com">START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
+    <footer><a className="wordmark" href="#top">ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer>
   </main>
 }
 
