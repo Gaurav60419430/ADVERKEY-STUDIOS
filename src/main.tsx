@@ -4,6 +4,7 @@ import './styles.css'
 import './iks.css'
 import './book-pages.css'
 import './aryabhata.css'
+import './catalogue.css'
 import iitKanpurLogo from './assets/iit-kanpur-logo.png'
 import manitBhopalLogo from './assets/manit-bhopal-logo.png'
 
@@ -47,12 +48,65 @@ function Header() {
   </header>
 }
 
-function Book() {
-  const [active, setActive] = useState(false)
-  return <button className={'book-wrap ' + (active ? 'book-active' : '')} onClick={() => setActive(!active)} aria-label="Reveal book details">
+type BookItem = { id: string, title: string, subtitle: string, kicker: string, cover: string, author: string, color: string }
+const defaultBooks: BookItem[] = [
+  { id: '1', title: 'THE\nLONG\nWAY\nHOME', subtitle: 'AN ORIGINAL STORY', kicker: 'THE / 01', cover: '#e34f33', author: 'Adverkey Press', color: '#f6cf70' },
+  { id: '2', title: 'GANITA', subtitle: 'THE LANGUAGE OF PATTERNS', kicker: '01 / GANITA', cover: '#1d4a3a', author: 'IKS Series', color: '#f1efe9' },
+  { id: '3', title: 'AKASHA', subtitle: 'READING THE NIGHT SKY', kicker: '02 / AKASHA', cover: '#1a2f5c', author: 'IKS Series', color: '#e7a664' },
+  { id: '4', title: 'BHUMI', subtitle: 'LAND, WATER, MEMORY', kicker: '03 / BHUMI', cover: '#5c3a1a', author: 'IKS Series', color: '#f6cf70' },
+]
+
+function Book({ onOpen }: { onOpen?: () => void }) {
+  return <a className="book-wrap" href="#catalogue" onClick={(e) => { e.preventDefault(); onOpen?.(); if (location.hash !== '#catalogue') location.hash = '#catalogue' }} aria-label="Open book catalogue">
     <div className="book" aria-hidden="true"><div className="book-spine"></div><div className="book-cover"><span className="sun">✺</span><em>THE</em><strong>LONG<br/>WAY<br/>HOME</strong><small>AN ORIGINAL STORY</small></div></div>
-    <span className="book-hint">{active ? 'A RESEARCH-LED READING JOURNEY' : 'EXPLORE A BOOK'} <Arrow /></span>
-  </button>
+    <span className="book-hint">EXPLORE A BOOK <Arrow /></span>
+  </a>
+}
+
+function Catalogue({ onBack }: { onBack: () => void }) {
+  const [books, setBooks] = useState<BookItem[]>(() => {
+    try { const s = localStorage.getItem('adverkey-catalogue'); return s ? JSON.parse(s) as BookItem[] : defaultBooks } catch { return defaultBooks }
+  })
+  const [dragOver, setDragOver] = useState(false)
+  useEffect(() => { try { localStorage.setItem('adverkey-catalogue', JSON.stringify(books)) } catch {} }, [books])
+  const addFiles = (files: FileList | null) => {
+    if (!files) return
+    Array.from(files).slice(0, 12).forEach(file => {
+      if (!file.type.startsWith('image/')) return
+      const reader = new FileReader()
+      reader.onload = () => {
+        const url = reader.result as string
+        setBooks(b => [...b, { id: String(Date.now() + Math.random()), title: file.name.replace(/\.[^.]+$/, '').toUpperCase().slice(0, 24) || 'UNTITLED', subtitle: 'UPLOADED', kicker: 'USER / UPLOAD', cover: url, author: 'Your upload', color: '#1d1d1b', }])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+  const remove = (id: string) => setBooks(b => b.filter(x => x.id !== id))
+  return <div className="catalogue">
+    <div className="catalogue-head">
+      <div>
+        <p className="eyebrow">BOOK CATALOGUE</p>
+        <h2>Your<br/><i>uploaded books.</i></h2>
+        <p className="catalogue-intro">Click the book on the home page to come here. Upload covers below — they’re saved locally in your browser so you can build your catalogue and share it.</p>
+      </div>
+      <button className="text-link" onClick={onBack}>← BACK TO HOME</button>
+    </div>
+    <div className="catalogue-grid">
+      {books.map(b => <div key={b.id} className="catalogue-card">
+        <div className="catalogue-cover" style={b.cover.startsWith('data:') || b.cover.startsWith('http') || b.cover.startsWith('blob:') ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
+          {!b.cover.startsWith('data:') && !b.cover.startsWith('http') && !b.cover.startsWith('blob:') && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
+        </div>
+        <div className="catalogue-meta"><span>{b.author}</span><button onClick={() => remove(b.id)} aria-label="Remove book" className="catalogue-remove">×</button></div>
+      </div>)}
+      <label className={`catalogue-upload ${dragOver ? 'is-drag' : ''}`} onDragOver={e => { e.preventDefault(); setDragOver(true) }} onDragLeave={() => setDragOver(false)} onDrop={e => { e.preventDefault(); setDragOver(false); addFiles(e.dataTransfer.files) }}>
+        <input type="file" accept="image/*" multiple onChange={e => addFiles(e.target.files)} hidden />
+        <span className="upload-plus">+</span>
+        <b>Upload book covers</b>
+        <small>Drag & drop images or click to browse<br/>PNG / JPG — saved locally</small>
+      </label>
+    </div>
+    <p className="catalogue-note">Tip: replace the demo books with your own. To reset, clear your browser storage for this site.</p>
+  </div>
 }
 
 function BuildField() {
@@ -70,7 +124,16 @@ function BuildField() {
 function App() {
   const [stage, setStage] = useState(0)
   const [topic, setTopic] = useState('PUBLISH A BOOK')
+  const [view, setView] = useState<'home' | 'catalogue'>(() => (typeof location !== 'undefined' && location.hash === '#catalogue' ? 'catalogue' : 'home'))
   useEffect(() => { document.documentElement.style.setProperty('--stage', String(stage)) }, [stage])
+  useEffect(() => {
+    const onHash = () => setView(location.hash === '#catalogue' ? 'catalogue' : 'home')
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  const goCatalogue = () => { location.hash = '#catalogue'; setView('catalogue'); window.scrollTo(0, 0) }
+  const goHome = () => { history.pushState('', document.title, window.location.pathname + window.location.search); setView('home'); window.scrollTo(0, 0) }
+  if (view === 'catalogue') return <main id="top"><Header /><div className="catalogue-wrap"><Catalogue onBack={goHome} /></div><footer><a className="wordmark" href="#top" onClick={e => { e.preventDefault(); goHome() }}>ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer></main>
   return <main id="top">
     <Header />
     <section className="hero" aria-labelledby="hero-title">
@@ -88,7 +151,7 @@ function App() {
 
     <Reveal className="chapter create" id="books">
       <div className="chapter-heading"><p className="eyebrow">01 / OUR READERS</p><p>BOOKS FOR EVERY AGE</p></div>
-      <div className="create-main"><div><h2>Books for<br/><i>curious minds.</i></h2><p>We make books that help young readers discover where ideas come from—and where they can go next. We edit, translate, design, and publish knowledge in forms people can read, enjoy, and remember.</p><a className="text-link" href="#method">HOW WE MAKE BOOKS <Arrow /></a></div><Book /></div>
+      <div className="create-main"><div><h2>Books for<br/><i>curious minds.</i></h2><p>We make books that help young readers discover where ideas come from—and where they can go next. We edit, translate, design, and publish knowledge in forms people can read, enjoy, and remember.</p><a className="text-link" href="#method">HOW WE MAKE BOOKS <Arrow /></a></div><Book onOpen={goCatalogue} /></div>
       <div className="audiences"><div><b>01</b><strong>CHILDREN</strong><span>Illustrated, story-led introductions to Indian ideas and traditions.</span></div><div><b>02</b><strong>TEENAGERS</strong><span>Context, curiosity, and deeper connections across subjects and time.</span></div><div><b>03</b><strong>COLLEGE</strong><span>Rigorous, accessible learning material for students and independent readers.</span></div></div>
       <div className="marquee"><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span></div>
     </Reveal>

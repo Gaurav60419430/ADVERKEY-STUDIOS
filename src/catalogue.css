@@ -1,0 +1,23 @@
+.catalogue-wrap{padding:92px var(--gutter) 0;min-height:100svh;background:var(--paper)}
+.catalogue{padding:2.5rem 0 4rem;max-width:1400px;margin:0 auto}
+.catalogue-head{display:flex;justify-content:space-between;align-items:flex-start;gap:3rem;border-top:1px solid var(--ink);padding-top:1.2rem}
+.catalogue-head h2{font:500 clamp(3rem,7vw,6.5rem)/.9 var(--display);letter-spacing:-.06em;margin:.6rem 0 0}
+.catalogue-intro{font-size:.98rem;line-height:1.5;max-width:38ch;margin:1.2rem 0 0;color:rgba(29,29,27,.78)}
+.catalogue-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:3.2rem}
+.catalogue-card{display:flex;flex-direction:column;gap:10px}
+.catalogue-cover{aspect-ratio:.68;width:100%;padding:12% 10%;display:flex;flex-direction:column;position:relative;overflow:hidden;box-shadow:0 8px 20px rgba(29,29,27,.12);border:1px solid rgba(29,29,27,.08)}
+.catalogue-cover .sun{font-size:1.6rem;line-height:1}
+.catalogue-cover em{font:9px var(--mono);margin-top:22%;opacity:.9}
+.catalogue-cover strong{font:600 clamp(1.4rem,2vw,1.9rem)/.85 var(--display);letter-spacing:-.06em;z-index:1;margin-top:6px}
+.catalogue-cover small{font:7px var(--mono);margin-top:auto;z-index:1;letter-spacing:.06em}
+.catalogue-meta{display:flex;justify-content:space-between;align-items:center;font:10px var(--mono);letter-spacing:.04em;border-top:1px solid var(--line);padding-top:8px}
+.catalogue-remove{background:none;border:1px solid var(--line);width:22px;height:22px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:14px;line-height:1}
+.catalogue-remove:hover{background:var(--ink);color:var(--paper)}
+.catalogue-upload{aspect-ratio:.68;border:1px dashed rgba(29,29,27,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.5rem;gap:.4rem;cursor:pointer;background:rgba(231,166,100,.08);transition:background .2s,border-color .2s}
+.catalogue-upload:hover,.catalogue-upload.is-drag{background:rgba(231,166,100,.18);border-color:var(--ink)}
+.upload-plus{width:52px;height:52px;border-radius:50%;border:1px solid var(--ink);display:grid;place-items:center;font-size:28px;line-height:1;margin-bottom:.6rem}
+.catalogue-upload b{font:500 1rem var(--display)}
+.catalogue-upload small{font:11px var(--mono);line-height:1.4;opacity:.7}
+.catalogue-note{font:11px var(--mono);opacity:.6;margin-top:1.8rem}
+@media(max-width:1100px){.catalogue-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.catalogue-head{flex-direction:column}.catalogue-grid{grid-template-columns:repeat(2,1fr);gap:14px}.catalogue-wrap{padding-top:64px}}

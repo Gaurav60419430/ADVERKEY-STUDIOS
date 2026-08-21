@@ -24,3 +24,25 @@
 
 /* Counter-moving, deliberately imperfect classic-cover bands behind the hero. */
 .hero-covers{position:absolute;inset:14% -8% 10%;z-index:0;display:flex;flex-direction:column;justify-content:center;gap:clamp(22px,4vw,56px);opacity:.17;filter:saturate(.72) contrast(1.08);transform:rotate(-3deg) skewX(-2deg);pointer-events:none}.cover-track{display:flex;width:max-content;animation:covers-forward 38s linear infinite;will-change:transform}.cover-track-reverse{margin-left:-42vw;animation-name:covers-reverse;animation-duration:45s}.cover-track i{display:block;width:max(1350px,100vw);height:clamp(125px,17vw,230px);background:url('./assets/classic-literature-strip.png') center/cover no-repeat;clip-path:polygon(0 4%,8% 0,17% 5%,27% 1%,38% 4%,49% 0,60% 5%,72% 1%,84% 4%,100% 0,99% 95%,90% 100%,77% 95%,64% 99%,50% 94%,36% 100%,23% 95%,10% 99%,0 95%)}.hero-index,.hero h1,.hero-bottom{position:relative}.hero h1{text-shadow:0 1px 0 rgba(241,239,233,.35)}@keyframes covers-forward{to{transform:translateX(-50%)}}@keyframes covers-reverse{from{transform:translateX(-50%)}to{transform:translateX(0)}}@media(max-width:720px){.hero-covers{inset:17% -55% 12%;gap:30px;opacity:.14}.cover-track i{height:150px;width:1150px}}@media(prefers-reduced-motion:reduce){.cover-track{animation:none!important}.cover-track-reverse{transform:translateX(-28%)}}
+
+/* --- CREATE section: little animation (subtle, intentional) --- */
+.create{position:relative;overflow:clip}
+.create::before{content:'';position:absolute;inset:-20% -10%;background:radial-gradient(ellipse 60% 50% at 72% 48%,rgba(255,255,255,.18),transparent 62%);pointer-events:none;animation:create-halo 9s ease-in-out infinite alternate}
+.book{animation:create-book-float 6.8s cubic-bezier(.45,0,.2,1) infinite;will-change:transform}
+.book-wrap::after{content:'';position:absolute;left:16%;right:16%;bottom:18px;height:18px;background:rgba(45,30,15,.22);filter:blur(14px);border-radius:50%;z-index:-1;pointer-events:none;animation:create-shadow 6.8s cubic-bezier(.45,0,.2,1) infinite}
+.book-cover .sun{display:inline-block;transform-origin:center;animation:sun-twirl 24s linear infinite}
+.book-cover::after{animation:lobe-drift 7s ease-in-out infinite alternate;will-change:transform}
+.marquee{display:flex;gap:0;overflow:hidden}
+.marquee span{flex-shrink:0;padding-right:2rem;min-width:max-content;animation:marquee-slide 26s linear infinite}
+.create-main>div>h2 i{display:inline-block;animation:curious-sway 5.5s ease-in-out infinite;transform-origin:left center}
+.book-wrap:hover .book,.book-active .book{animation:none;transform:rotate(-2deg) translateY(-18px) scale(1.018) !important}
+.book-wrap:hover::after,.book-active::after{animation-play-state:paused}
+.marquee:hover span{animation-play-state:paused}
+@keyframes create-book-float{0%,100%{transform:rotate(6deg) translateY(0)}35%{transform:rotate(4deg) translateY(-11px)}65%{transform:rotate(7.5deg) translateY(6px)}}
+@keyframes create-shadow{0%,100%{transform:scale(1);opacity:.22}35%{transform:scale(.82) translateX(-6px);opacity:.14}65%{transform:scale(1.06) translateX(4px);opacity:.20}}
+@keyframes create-halo{from{transform:translateX(0)}to{transform:translateX(-14px)}}
+@keyframes sun-twirl{to{transform:rotate(360deg)}}
+@keyframes lobe-drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-7px,5px) scale(1.04)}}
+@keyframes marquee-slide{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@keyframes curious-sway{0%,100%{transform:skewX(0deg)}50%{transform:skewX(-1.2deg)}}
+@media(prefers-reduced-motion:reduce){.create::before,.book,.book-wrap::after,.book-cover .sun,.book-cover::after,.marquee span,.create-main>div>h2 i{animation:none!important}}
