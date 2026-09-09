@@ -19,7 +19,43 @@ const stages = [
 function Arrow() { return <span className="arrow" aria-hidden="true">↗</span> }
 
 function HeroBook() {
-  return <div className="hero-book hero-book--closed" aria-hidden="true"><div className="hero-book-cover hero-book-cover-back"></div><div className="hero-book-pages"><i className="page-spread page-spread-1"><span className="page-kicker">01 / GANITA</span><b>0 · 1 · 1 · 2</b><em className="page-diagram page-orbit"></em><small>THE LANGUAGE OF PATTERNS</small></i><i className="page-spread page-spread-2"><span className="page-kicker">02 / AKASHA</span><b>✦</b><em className="page-diagram page-constellation"></em><small>READING THE NIGHT SKY</small></i><i className="page-spread page-spread-3"><span className="page-kicker">03 / BHUMI</span><b>△</b><em className="page-diagram page-map"></em><small>LAND, WATER, MEMORY</small></i><i className="page-spread page-spread-4"><span className="page-kicker">04 / SHABDA</span><b>ॐ</b><em className="page-diagram page-lines"></em><small>WORDS THAT TRAVEL</small></i><i className="page-spread page-spread-5"><span className="page-kicker">05 / KALA</span><b>✺</b><em className="page-diagram page-grid"></em><small>FORM, RHYTHM, MAKING</small></i></div><div className="hero-book-cover hero-book-cover-front"><span>IKS</span><b>READ<br/>INDIA</b><small>ADVERKEY PRESS</small></div></div>
+  const [open, setOpen] = useState(false)
+  const tilt = useRef<HTMLDivElement>(null)
+  const lean = (event: React.PointerEvent<HTMLDivElement>) => {
+    const el = tilt.current
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const bounds = el.getBoundingClientRect()
+    el.style.setProperty('--tilt-x', `${((event.clientY - bounds.top) / bounds.height - .5) * -14}deg`)
+    el.style.setProperty('--tilt-y', `${((event.clientX - bounds.left) / bounds.width - .5) * 18}deg`)
+  }
+  const level = () => { tilt.current?.style.setProperty('--tilt-x', '0deg'); tilt.current?.style.setProperty('--tilt-y', '0deg') }
+  return <div ref={tilt} className="hero-book-tilt" role="button" tabIndex={0} aria-pressed={open} aria-label={open ? 'Close the floating book' : 'Open the floating book'} onClick={() => setOpen(o => !o)} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(o => !o) } }} onPointerMove={lean} onPointerLeave={level}><div className={`hero-book${open ? ' is-open' : ' hero-book--closed'}`} aria-hidden="true"><div className="hero-book-cover hero-book-cover-back"></div><div className="hero-book-pages"><i className="page-spread page-spread-1"><span className="page-kicker">01 / GANITA</span><b>0 · 1 · 1 · 2</b><p className="page-text">Zero woke up one morning and asked: what if nothing is something?</p><em className="page-diagram page-orbit"></em><small>THE LANGUAGE OF PATTERNS</small></i><i className="page-spread page-spread-2"><span className="page-kicker">02 / AKASHA</span><b>✦</b><p className="page-text">Aryabhata looked up and read the night sky like a manuscript.</p><em className="page-diagram page-constellation"></em><small>READING THE NIGHT SKY</small></i><i className="page-spread page-spread-3"><span className="page-kicker">03 / BHUMI</span><b>△</b><p className="page-text">Rivers remember every field they ever fed.</p><em className="page-diagram page-map"></em><small>LAND, WATER, MEMORY</small></i><i className="page-spread page-spread-4"><span className="page-kicker">04 / SHABDA</span><b>ॐ</b><p className="page-text">Every word you speak travelled a thousand years to reach you.</p><em className="page-diagram page-lines"></em><small>WORDS THAT TRAVEL</small></i><i className="page-spread page-spread-5"><span className="page-kicker">05 / KALA</span><b>✺</b><p className="page-text">Hands shape clay; rhythm shapes time.</p><em className="page-diagram page-grid"></em><small>FORM, RHYTHM, MAKING</small></i></div><div className="hero-book-cover hero-book-cover-front"><span>IKS</span><b>READ<br/>INDIA</b><small>ADVERKEY PRESS</small></div></div><span className="hero-book-hint" aria-hidden="true">{open ? 'CLICK TO CLOSE ✕' : 'CLICK TO OPEN ↗'}</span></div>
+}
+
+function HeroTitle() {
+  const ref = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    const h1 = ref.current
+    const hero = h1?.closest('.hero') as HTMLElement | null
+    if (!h1 || !hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const chars = Array.from(h1.querySelectorAll('.hero-char')) as HTMLElement[]
+    const RADIUS = 300
+    const move = (event: PointerEvent) => {
+      chars.forEach(c => {
+        const r = c.getBoundingClientRect()
+        const dx = (r.left + r.width / 2) - event.clientX
+        const dy = (r.top + r.height / 2) - event.clientY
+        const d = Math.hypot(dx, dy)
+        c.style.transform = (d < RADIUS && d > 0.1) ? `translate(${(dx / d * (1 - d / RADIUS) * 70).toFixed(1)}px, ${(dy / d * (1 - d / RADIUS) * 70).toFixed(1)}px) rotate(${(dx / RADIUS * 14).toFixed(1)}deg)` : ''
+      })
+    }
+    const leave = () => chars.forEach(c => { c.style.transform = '' })
+    hero.addEventListener('pointermove', move)
+    hero.addEventListener('pointerleave', leave)
+    return () => { hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', leave) }
+  }, [])
+  const line = (text: string) => text.split('').map((ch, i) => <span key={i} className="hero-char">{ch === ' ' ? ' ' : ch}</span>)
+  return <h1 id="hero-title" ref={ref}><span className="hero-line">{line('LEARN')}</span><span className="hero-line">{line('FROM OUR')}</span><span className="hero-line">{line('ROOTS.')}</span></h1>
 }
 
 function Reveal({ children, className = '', id }: { children: ReactNode, className?: string, id?: string }) {
@@ -123,7 +159,7 @@ function BuildField() {
 
 function App() {
   const [stage, setStage] = useState(0)
-  const [topic, setTopic] = useState('PUBLISH A BOOK')
+  const [topic, setTopic] = useState('WANT TO PUBLISH A BOOK')
   const [view, setView] = useState<'home' | 'catalogue'>(() => (typeof location !== 'undefined' && location.hash === '#catalogue' ? 'catalogue' : 'home'))
   useEffect(() => { document.documentElement.style.setProperty('--stage', String(stage)) }, [stage])
   useEffect(() => {
@@ -131,6 +167,12 @@ function App() {
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+  useEffect(() => {
+    if (view !== 'home') return
+    const id = location.hash.replace('#', '')
+    if (!id || id === 'catalogue' || id === 'top') return
+    requestAnimationFrame(() => { document.getElementById(id)?.scrollIntoView() })
+  }, [view])
   const goCatalogue = () => { location.hash = '#catalogue'; setView('catalogue'); window.scrollTo(0, 0) }
   const goHome = () => { history.pushState('', document.title, window.location.pathname + window.location.search); setView('home'); window.scrollTo(0, 0) }
   if (view === 'catalogue') return <main id="top"><Header /><div className="catalogue-wrap"><Catalogue onBack={goHome} /></div><footer><a className="wordmark" href="#top" onClick={e => { e.preventDefault(); goHome() }}>ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer></main>
@@ -142,7 +184,7 @@ function App() {
         <div className="cover-track cover-track-reverse"><i></i><i></i></div>
       </div>
       <div className="hero-index">001 / RESEARCH-LED PUBLISHING</div>
-      <h1 id="hero-title"><span>LEARN</span><span>FROM OUR</span><span>ROOTS.</span></h1>
+      <HeroTitle />
       <div className="hero-bottom"><p>Adverkey Studios turns research, scholarship, and living traditions into books for the next generation.</p><a href="#books" className="circle-link" aria-label="Explore our books">↓</a><p className="hero-note">IKS / RESEARCH / LEARNING</p></div>
       <HeroBook />
     </section>
@@ -162,7 +204,7 @@ function App() {
 
     <Reveal className="chapter build" id="iks"><div className="chapter-heading"><p className="eyebrow">03 / WHY IKS</p><p>IDEAS THAT STILL SPEAK</p></div><div className="build-grid"><div><h2>Old wisdom,<br/><i>new questions.</i></h2><p>Indian Knowledge Systems are the many ways people in India have studied, understood, recorded, and passed on knowledge across generations. Our books explore mathematics, astronomy, ecology, medicine, philosophy, literature, architecture, and the arts.</p><a className="text-link" href="#contact">EXPLORE A TOPIC <Arrow /></a></div><BuildField /></div></Reveal>
 
-    <Reveal className="contact" id="contact"><p className="eyebrow">A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href="mailto:hello@adverkey.com">START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
+    <Reveal className="contact" id="contact"><p className="eyebrow">A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons" role="radiogroup" aria-label="What brings you here?">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button role="radio" aria-checked={topic === x} className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href={`mailto:hello@adverkey.com?subject=${encodeURIComponent(topic + ' — Adverkey Studios enquiry')}`}>START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
     <footer><a className="wordmark" href="#top">ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer>
   </main>
 }

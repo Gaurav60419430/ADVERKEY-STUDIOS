@@ -2,3 +2,32 @@
 .cover-track i{background-image:url('./assets/iks-academic-collage.png');background-position:center;background-size:cover;filter:contrast(1.12) saturate(.76) sepia(.18)}.hero-book{right:-6vw;top:24%;z-index:0;transform:rotate(5deg) scale(.78);transform-origin:right center}.hero h1{z-index:2}.hero-book-pages{overflow:hidden;background-color:#f7f0df;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 13px,rgba(45,37,28,.12) 14px)}.hero-book-pages:after{content:'05 / VEDA\A\A SOURCE NOTES\A FIELD STUDY\A ASTRONOMY\A ECOLOGY\A MATHEMATICS';white-space:pre-line;display:block;inset:12% 13%;border:0;font:7px/2.1 var(--mono);letter-spacing:.06em;color:#5d271e;opacity:.82}.hero-book-pages:before{content:'';position:absolute;width:42%;aspect-ratio:1;border:1px solid #b9412f;border-radius:50%;right:14%;bottom:15%;box-shadow:inset 0 0 0 9px #f7f0df,inset 0 0 0 10px #b9412f}.hero-book-pages i.page-spread{backface-visibility:visible}.hero-book-pages i.page-spread:after{content:'';position:absolute;inset:8%;border:1px solid rgba(185,65,47,.12);pointer-events:none}@media(max-width:720px){.hero-book{right:-17vw;top:28%;transform:rotate(5deg) scale(.68)}}
 .institutions{background:var(--paper);color:var(--ink);border:0;padding:24px;margin-top:5rem;display:grid;grid-template-columns:1fr 1fr;column-gap:28px}.institutions>p{grid-column:1/-1;color:var(--ink);margin:0 0 12px}.institution-mark{border:0;min-height:120px;padding:16px 18px;background:transparent;display:flex;align-items:center;gap:18px}.institution-logo{background:transparent;width:92px;height:72px;flex:0 0 92px;padding:0}.institution-logo img{filter:grayscale(1);opacity:.72}.institution-mark span{color:var(--ink);font-size:9px}.institution-mark strong{font-size:1.3em}@media(max-width:720px){.institutions{grid-template-columns:1fr;gap:0;padding:18px 14px}.institutions>p{margin-bottom:4px}.institution-mark{min-height:96px;padding:12px 0;border-top:1px solid var(--line)}.institution-logo{width:76px;height:60px;flex-basis:76px}}
 .hero-book--closed{--book-scale:.78;right:-6vw;top:24%;z-index:0;transform-origin:right center;animation:book-float 8.5s cubic-bezier(.42,0,.18,1) infinite}.hero-book--closed:after{content:'';position:absolute;z-index:-1;width:76%;height:10%;left:15%;top:102%;border-radius:50%;background:rgba(29,29,27,.28);filter:blur(13px);animation:book-shadow 8.5s cubic-bezier(.42,0,.18,1) infinite}.hero-book--closed .hero-book-cover-front{inset:0 0 6px 0;animation:none;transform:none;backface-visibility:visible}.hero-book--closed .hero-book-cover-back{inset:6px -9px -5px 9px;transform:none;background:#8b3628}.hero-book--closed .hero-book-pages{inset:3px -5px -2px 5px;transform:none;overflow:hidden;background:#f7f0df;box-shadow:1px 1px 0 #c8bca7,2px 2px 0 #f7f0df,3px 3px 0 #c8bca7,4px 4px 0 #f7f0df,5px 5px 0 #c8bca7}.hero-book--closed .hero-book-pages:before,.hero-book--closed .hero-book-pages:after,.hero-book--closed .hero-book-pages i{display:none}@keyframes book-float{0%,100%{transform:translate3d(0,0,0) rotate(5deg) scale(var(--book-scale))}25%{transform:translate3d(-18px,-24px,0) rotate(1deg) scale(var(--book-scale))}55%{transform:translate3d(-42px,-10px,0) rotate(8deg) scale(var(--book-scale))}78%{transform:translate3d(-16px,12px,0) rotate(4deg) scale(var(--book-scale))}}@keyframes book-shadow{0%,100%{transform:translate(0,0) scale(1);opacity:.27}25%{transform:translate(18px,14px) scale(.72);opacity:.12}55%{transform:translate(38px,8px) scale(.82);opacity:.17}78%{transform:translate(15px,-3px) scale(.94);opacity:.23}}@media(max-width:720px){.hero-book--closed{--book-scale:.62;right:-13vw;top:29%}}@media(prefers-reduced-motion:reduce){.hero-book--closed,.hero-book--closed:after{animation:none}}
+
+/* Interactive hero book: pointer tilt wrapper + click-to-open fan. */
+.hero-book-tilt{position:absolute;right:-6vw;top:24%;z-index:1;perspective:1500px;transform:rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));transform-style:preserve-3d;transition:transform .35s var(--ease);cursor:pointer}
+.hero-book-tilt:focus-visible{outline:2px solid var(--red);outline-offset:10px}
+.hero-book-tilt .hero-book{position:relative;right:auto;top:auto}
+.hero-book-cover-front,.hero-book-pages i{transition:transform .65s cubic-bezier(.55,.08,.35,1)}
+.hero-book.is-open{--book-scale:.82;transform:rotate(-2deg) scale(var(--book-scale));animation:book-open-pop .7s var(--ease)}
+.hero-book.is-open .hero-book-cover-front{animation:none;transform:rotateY(-155deg)}
+.hero-book.is-open .hero-book-pages{overflow:visible}
+.hero-book.is-open .hero-book-pages i{animation:none;box-shadow:2px 0 3px rgba(29,29,27,.18)}
+.hero-book.is-open .hero-book-pages i:nth-child(1){transform:rotateY(-160deg)}
+.hero-book.is-open .hero-book-pages i:nth-child(2){transform:rotateY(-130deg)}
+.hero-book.is-open .hero-book-pages i:nth-child(3){transform:rotateY(-100deg)}
+.hero-book.is-open .hero-book-pages i:nth-child(4){transform:rotateY(-70deg)}
+.hero-book.is-open .hero-book-pages i:nth-child(5){transform:rotateY(-40deg)}
+@keyframes book-open-pop{0%{scale:1}40%{scale:1.06}100%{scale:1}}
+.hero-book-hint{display:block;margin-top:14px;text-align:center;font:10px var(--mono);letter-spacing:.1em;color:var(--ink);opacity:.55;pointer-events:none;animation:hint-pulse 2.6s ease-in-out infinite}
+.hero-book-tilt:hover .hero-book-hint,.hero-book-tilt:focus-visible .hero-book-hint{opacity:1}
+@keyframes hint-pulse{0%,100%{opacity:.35}50%{opacity:.8}}
+@media(max-width:720px){.hero-book-tilt{right:-17vw;top:28%}.hero-book.is-open{--book-scale:.66}}
+@media(prefers-reduced-motion:reduce){.hero-book-tilt{transform:none}.hero-book.is-open{animation:none}.hero-book-hint{animation:none}}
+.hero-book.is-open .hero-book-pages:before,.hero-book.is-open .hero-book-pages:after{display:none}
+.hero-book.is-open .hero-book-pages i:nth-child(1){transform:rotateY(-158deg) translateX(-34px)}
+.hero-book.is-open .hero-book-pages i:nth-child(2){transform:rotateY(-126deg) translateX(-22px)}
+.hero-book.is-open .hero-book-pages i:nth-child(3){transform:rotateY(-96deg) translateX(-10px)}
+.hero-book.is-open .hero-book-pages i:nth-child(4){transform:rotateY(-66deg) translateX(0)}
+.hero-book.is-open .hero-book-pages i:nth-child(5){transform:rotateY(-36deg) translateX(8px)}
+.hero-book-pages .page-spread .page-text{font:9px/1.5 var(--mono);letter-spacing:.02em;color:#4a3a2e;margin:12px 0 0;max-width:21ch;position:relative;z-index:1}
+.hero-book.is-open .hero-book-pages{overflow:visible;perspective:1200px}
