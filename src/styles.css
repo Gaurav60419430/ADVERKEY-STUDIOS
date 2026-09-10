@@ -46,3 +46,8 @@
 @keyframes marquee-slide{from{transform:translateX(0)}to{transform:translateX(-100%)}}
 @keyframes curious-sway{0%,100%{transform:skewX(0deg)}50%{transform:skewX(-1.2deg)}}
 @media(prefers-reduced-motion:reduce){.create::before,.book,.book-wrap::after,.book-cover .sun,.book-cover::after,.marquee span,.create-main>div>h2 i{animation:none!important}}
+.hero h1 .hero-line{display:block;padding-left:0}
+.hero h1 .hero-line:nth-child(2){padding-left:19vw}
+.hero h1 .hero-line:nth-child(3){padding-left:5vw}
+.hero h1 .hero-char{display:inline-block;letter-spacing:0;padding-left:0!important;clip-path:none!important;animation:none!important;transition:transform .3s var(--ease);will-change:transform}
+@media(max-width:720px){.hero h1 .hero-line:nth-child(2){padding-left:5vw}.hero h1 .hero-line:nth-child(3){padding-left:13vw}}
