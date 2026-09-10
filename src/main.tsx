@@ -120,6 +120,7 @@ function ScrollProgress() {
 }
 
 type BookItem = { id: string, title: string, subtitle: string, kicker: string, cover: string, author: string, color: string }
+const isImage = (c: string) => c.startsWith('data:') || c.startsWith('http') || c.startsWith('blob:') || c.startsWith('.') || c.endsWith('.svg')
 const defaultBooks: BookItem[] = [
   { id: '1', title: 'THE\nLONG\nWAY\nHOME', subtitle: 'AN ORIGINAL STORY', kicker: 'THE / 01', cover: '#e34f33', author: 'Adverkey Press', color: '#f6cf70' },
   { id: '2', title: 'GANITA', subtitle: 'THE LANGUAGE OF PATTERNS', kicker: '01 / GANITA', cover: `${import.meta.env.BASE_URL}proposals/cover-ganita.svg`, author: 'IKS Series', color: '#f1efe9' },
@@ -164,8 +165,8 @@ function Catalogue({ onBack }: { onBack: () => void }) {
     </div>
     <div className="catalogue-grid">
       {books.map(b => <div key={b.id} className="catalogue-card">
-        <div className="catalogue-cover" style={b.cover.startsWith('data:') || b.cover.startsWith('http') || b.cover.startsWith('blob:') || b.cover.startsWith('.') ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
-          {!b.cover.startsWith('data:') && !b.cover.startsWith('http') && !b.cover.startsWith('blob:') && !b.cover.startsWith('.') && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
+        <div className="catalogue-cover" style={isImage(b.cover) ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
+          {!isImage(b.cover) && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
         </div>
         <div className="catalogue-meta"><span>{b.author}</span><button onClick={() => remove(b.id)} aria-label="Remove book" className="catalogue-remove">×</button></div>
       </div>)}
