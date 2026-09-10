@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Proposed book cover: Ganita, the language of patterns">
+  <rect width="600" height="900" fill="#1d1d1b"/>
+  <rect x="26" y="26" width="548" height="848" fill="none" stroke="#f1efe9" stroke-opacity=".35" stroke-width="2"/>
+  <text x="52" y="86" font-family="monospace" font-size="20" letter-spacing="3" fill="#e7a664">01 / GANITA</text>
+  <g fill="none" stroke="#e7a664" stroke-width="2" opacity=".85">
+    <circle cx="300" cy="400" r="120"/>
+    <circle cx="300" cy="400" r="80"/>
+    <circle cx="380" cy="340" r="10" fill="#e7a664" stroke="none"/>
+  </g>
+  <text x="300" y="408" text-anchor="middle" font-family="monospace" font-size="34" letter-spacing="6" fill="#f1efe9">0 · 1 · 1 · 2</text>
+  <text x="52" y="640" font-family="Georgia, serif" font-size="60" font-weight="600" letter-spacing="-1" fill="#f1efe9">Zero asked:</text>
+  <text x="52" y="720" font-family="Georgia, serif" font-style="italic" font-size="50" fill="#e7a664">what if nothing</text>
+  <text x="52" y="790" font-family="Georgia, serif" font-style="italic" font-size="50" fill="#e7a664">is something?</text>
+  <text x="52" y="852" font-family="monospace" font-size="16" letter-spacing="2" fill="#f1efe9" opacity=".7">ADVERKEY PRESS · PATTERNS</text>
+</svg>
