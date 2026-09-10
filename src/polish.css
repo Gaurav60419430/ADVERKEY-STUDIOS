@@ -1,0 +1,37 @@
+/* Aesthetic pass: texture, polish, mobile nav, progress. Loaded last so it wins ties. */
+::selection{background:var(--red);color:var(--paper)}
+
+/* Paper grain over everything (non-interactive print texture). */
+body::after{content:'';position:fixed;inset:0;z-index:200;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Gentle tonal shifts so long scrolls breathe between bold chapters. */
+.manifesto{background:#eae4d3}
+.process{background:#e6e1d1}
+
+/* The typographic series strip is drawn close to paper tone so it reads as
+   texture, not a competing headline; the photo track keeps full presence. */
+.cover-track-forward{opacity:.5}
+
+/* Scroll progress hairline. */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;width:100%;background:var(--red);transform:scaleX(0);transform-origin:left;z-index:120}
+
+/* Topic pills get the same underline-hover as text links. */
+.topic-buttons button{position:relative}
+.topic-buttons button::after{content:'';position:absolute;left:12px;right:12px;bottom:12px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.topic-buttons button:hover::after{transform:scaleX(1)}
+.topic-buttons .chosen::after{display:none}
+
+/* Second marquee bridging the IKS chapter into contact. */
+.marquee--alt{border-bottom:1px solid rgba(29,29,27,.5)}
+
+@media(max-width:720px){
+  /* Dock the hero book clear of the headline on small screens. */
+  .hero-book-tilt{right:-6vw;top:auto;bottom:7%}
+  .hero-book--closed{--book-scale:.58;right:auto;top:auto}
+  .hero-book-tilt .hero-book{transform-origin:bottom right}
+  /* Full-screen ink navigation overlay with large serif links. */
+  .nav.open{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:center;gap:1.4rem;padding:0 var(--gutter);background:var(--ink);color:var(--paper);font:500 clamp(2.6rem,11vw,4.2rem)/1 var(--display);letter-spacing:-.05em;border:0}
+  .nav.open a{width:max-content}
+  .header:has(.nav.open) .wordmark,.header:has(.nav.open) .menu{position:relative;z-index:41;color:var(--paper)}
+  .header:has(.nav.open) .menu i{background:var(--paper)}
+}

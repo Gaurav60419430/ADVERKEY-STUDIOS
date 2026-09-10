@@ -5,6 +5,7 @@ import './iks.css'
 import './book-pages.css'
 import './aryabhata.css'
 import './catalogue.css'
+import './polish.css'
 import iitKanpurLogo from './assets/iit-kanpur-logo.png'
 import manitBhopalLogo from './assets/manit-bhopal-logo.png'
 
@@ -39,20 +40,27 @@ function HeroTitle() {
     const hero = h1?.closest('.hero') as HTMLElement | null
     if (!h1 || !hero || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const chars = Array.from(h1.querySelectorAll('.hero-char')) as HTMLElement[]
-    const RADIUS = 300
-    const move = (event: PointerEvent) => {
+    const RADIUS = 170
+    let raf = 0
+    let px = 0, py = 0
+    const apply = () => {
+      raf = 0
       chars.forEach(c => {
         const r = c.getBoundingClientRect()
-        const dx = (r.left + r.width / 2) - event.clientX
-        const dy = (r.top + r.height / 2) - event.clientY
+        const dx = (r.left + r.width / 2) - px
+        const dy = (r.top + r.height / 2) - py
         const d = Math.hypot(dx, dy)
-        c.style.transform = (d < RADIUS && d > 0.1) ? `translate(${(dx / d * (1 - d / RADIUS) * 70).toFixed(1)}px, ${(dy / d * (1 - d / RADIUS) * 70).toFixed(1)}px) rotate(${(dx / RADIUS * 14).toFixed(1)}deg)` : ''
+        c.style.transform = (d < RADIUS && d > 0.1) ? `translate(${(dx / d * (1 - d / RADIUS) * 26).toFixed(1)}px, ${(dy / d * (1 - d / RADIUS) * 26).toFixed(1)}px) rotate(${(dx / RADIUS * 6).toFixed(1)}deg)` : ''
       })
     }
-    const leave = () => chars.forEach(c => { c.style.transform = '' })
+    const move = (event: PointerEvent) => {
+      px = event.clientX; py = event.clientY
+      if (!raf) raf = requestAnimationFrame(apply)
+    }
+    const leave = () => { if (raf) cancelAnimationFrame(raf); raf = 0; chars.forEach(c => { c.style.transform = '' }) }
     hero.addEventListener('pointermove', move)
     hero.addEventListener('pointerleave', leave)
-    return () => { hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', leave) }
+    return () => { if (raf) cancelAnimationFrame(raf); hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', leave) }
   }, [])
   const line = (text: string) => text.split('').map((ch, i) => <span key={i} className="hero-char">{ch === ' ' ? ' ' : ch}</span>)
   return <h1 id="hero-title" ref={ref}><span className="hero-line">{line('LEARN')}</span><span className="hero-line">{line('FROM OUR')}</span><span className="hero-line">{line('ROOTS.')}</span></h1>
@@ -74,6 +82,14 @@ function Reveal({ children, className = '', id }: { children: ReactNode, classNa
 
 function Header() {
   const [open, setOpen] = useState(false)
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('keydown', onKey)
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = prev }
+  }, [open])
   return <header className="header">
     <a className="wordmark" href="#top" aria-label="Adverkey Studios home">ADVERKEY<span>STUDIOS</span></a>
     <nav className={open ? 'nav open' : 'nav'} aria-label="Primary navigation">
@@ -84,12 +100,31 @@ function Header() {
   </header>
 }
 
+function ScrollProgress() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const h = document.documentElement
+      const max = h.scrollHeight - h.clientHeight
+      ref.current?.style.setProperty('transform', `scaleX(${max > 0 ? h.scrollTop / max : 0})`)
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [])
+  return <div ref={ref} className="scroll-progress" aria-hidden="true"></div>
+}
+
 type BookItem = { id: string, title: string, subtitle: string, kicker: string, cover: string, author: string, color: string }
 const defaultBooks: BookItem[] = [
   { id: '1', title: 'THE\nLONG\nWAY\nHOME', subtitle: 'AN ORIGINAL STORY', kicker: 'THE / 01', cover: '#e34f33', author: 'Adverkey Press', color: '#f6cf70' },
-  { id: '2', title: 'GANITA', subtitle: 'THE LANGUAGE OF PATTERNS', kicker: '01 / GANITA', cover: '#1d4a3a', author: 'IKS Series', color: '#f1efe9' },
-  { id: '3', title: 'AKASHA', subtitle: 'READING THE NIGHT SKY', kicker: '02 / AKASHA', cover: '#1a2f5c', author: 'IKS Series', color: '#e7a664' },
-  { id: '4', title: 'BHUMI', subtitle: 'LAND, WATER, MEMORY', kicker: '03 / BHUMI', cover: '#5c3a1a', author: 'IKS Series', color: '#f6cf70' },
+  { id: '2', title: 'GANITA', subtitle: 'THE LANGUAGE OF PATTERNS', kicker: '01 / GANITA', cover: `${import.meta.env.BASE_URL}proposals/cover-ganita.svg`, author: 'IKS Series', color: '#f1efe9' },
+  { id: '3', title: 'AKASHA', subtitle: 'READING THE NIGHT SKY', kicker: '02 / AKASHA', cover: `${import.meta.env.BASE_URL}proposals/cover-akasha.svg`, author: 'IKS Series', color: '#e7a664' },
+  { id: '4', title: 'BHUMI', subtitle: 'LAND, WATER, MEMORY', kicker: '03 / BHUMI', cover: `${import.meta.env.BASE_URL}proposals/cover-bhumi.svg`, author: 'IKS Series', color: '#f6cf70' },
 ]
 
 function Book({ onOpen }: { onOpen?: () => void }) {
@@ -129,8 +164,8 @@ function Catalogue({ onBack }: { onBack: () => void }) {
     </div>
     <div className="catalogue-grid">
       {books.map(b => <div key={b.id} className="catalogue-card">
-        <div className="catalogue-cover" style={b.cover.startsWith('data:') || b.cover.startsWith('http') || b.cover.startsWith('blob:') ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
-          {!b.cover.startsWith('data:') && !b.cover.startsWith('http') && !b.cover.startsWith('blob:') && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
+        <div className="catalogue-cover" style={b.cover.startsWith('data:') || b.cover.startsWith('http') || b.cover.startsWith('blob:') || b.cover.startsWith('.') ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
+          {!b.cover.startsWith('data:') && !b.cover.startsWith('http') && !b.cover.startsWith('blob:') && !b.cover.startsWith('.') && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
         </div>
         <div className="catalogue-meta"><span>{b.author}</span><button onClick={() => remove(b.id)} aria-label="Remove book" className="catalogue-remove">×</button></div>
       </div>)}
@@ -175,8 +210,9 @@ function App() {
   }, [view])
   const goCatalogue = () => { location.hash = '#catalogue'; setView('catalogue'); window.scrollTo(0, 0) }
   const goHome = () => { history.pushState('', document.title, window.location.pathname + window.location.search); setView('home'); window.scrollTo(0, 0) }
-  if (view === 'catalogue') return <main id="top"><Header /><div className="catalogue-wrap"><Catalogue onBack={goHome} /></div><footer><a className="wordmark" href="#top" onClick={e => { e.preventDefault(); goHome() }}>ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer></main>
+  if (view === 'catalogue') return <main id="top"><ScrollProgress /><Header /><div className="catalogue-wrap"><Catalogue onBack={goHome} /></div><footer><a className="wordmark" href="#top" onClick={e => { e.preventDefault(); goHome() }}>ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer></main>
   return <main id="top">
+    <ScrollProgress />
     <Header />
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-covers" aria-hidden="true">
@@ -198,13 +234,14 @@ function App() {
       <div className="marquee"><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span></div>
     </Reveal>
 
-    <Reveal className="process" id="method"><div className="process-head"><p className="eyebrow">FROM SOURCE TO LAST PAGE</p><h2>Research becomes<br/><i>a reading journey.</i></h2></div><div className="stages" role="tablist" aria-label="Our publishing process">{[['01','SOURCE','Research papers, texts, and knowledge traditions.'],['02','VERIFY','Academic review, source checking, and editorial care.'],['03','TRANSLATE','Complex ideas made clear, vivid, and age-appropriate.'],['04','DESIGN','Illustrations, structure, and visual learning that invite attention.'],['05','PUBLISH','Books made for classrooms, homes, and independent reading.']].map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {['SOURCE','VERIFY','TRANSLATE','DESIGN','PUBLISH'][stage]} </span><div className="page page-a"></div><div className="page page-b"></div><div className="ink">{stage === 0 ? 'ॐ' : stage === 1 ? '∴' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
+    <Reveal className="process" id="method"><div className="process-head"><p className="eyebrow">02 / FROM SOURCE TO LAST PAGE</p><h2>Research becomes<br/><i>a reading journey.</i></h2></div><div className="stages" role="tablist" aria-label="Our publishing process">{[['01','SOURCE','Research papers, texts, and knowledge traditions.'],['02','VERIFY','Academic review, source checking, and editorial care.'],['03','TRANSLATE','Complex ideas made clear, vivid, and age-appropriate.'],['04','DESIGN','Illustrations, structure, and visual learning that invite attention.'],['05','PUBLISH','Books made for classrooms, homes, and independent reading.']].map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {['SOURCE','VERIFY','TRANSLATE','DESIGN','PUBLISH'][stage]} </span><div className="page page-a"></div><div className="page page-b"></div><div className="ink">{stage === 0 ? 'ॐ' : stage === 1 ? '∴' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
 
-    <Reveal className="chapter back" id="trust"><div className="chapter-heading"><p className="eyebrow">02 / TRUSTED SOURCES</p><p>ACADEMIC COLLABORATION</p></div><div className="back-grid"><h2>Knowledge with<br/><i>a foundation.</i></h2><div className="back-copy"><p>We work with contributors from academic and research communities, including relationships connected to IIT Kanpur and MANIT Bhopal. Their research and source material help give our books a strong foundation.</p><p className="muted">These institutions represent contributor and research relationships, not an institutional endorsement of Adverkey Studios or its publications.</p><a className="text-link light" href="#contact">COLLABORATE WITH US <Arrow /></a></div><div className="institutions" aria-label="Trusted partners connected to our contributors"><p>TRUSTED PARTNERS</p><div className="institution-mark"><div className="institution-logo"><img src={iitKanpurLogo} alt="IIT Kanpur logo" /></div><span>INDIAN INSTITUTE OF TECHNOLOGY<br/><strong>KANPUR</strong></span></div><div className="institution-mark"><div className="institution-logo"><img src={manitBhopalLogo} alt="MANIT Bhopal logo" /></div><span>MAULANA AZAD NATIONAL INSTITUTE OF TECHNOLOGY<br/><strong>BHOPAL</strong></span></div></div></div></Reveal>
+    <Reveal className="chapter back" id="trust"><div className="chapter-heading"><p className="eyebrow">03 / TRUSTED SOURCES</p><p>ACADEMIC COLLABORATION</p></div><div className="back-grid"><h2>Knowledge with<br/><i>a foundation.</i></h2><div className="back-copy"><p>We work with contributors from academic and research communities, including relationships connected to IIT Kanpur and MANIT Bhopal. Their research and source material help give our books a strong foundation.</p><p className="muted">These institutions represent contributor and research relationships, not an institutional endorsement of Adverkey Studios or its publications.</p><a className="text-link light" href="#contact">COLLABORATE WITH US <Arrow /></a></div><div className="institutions" aria-label="Trusted partners connected to our contributors"><p>TRUSTED PARTNERS</p><div className="institution-mark"><div className="institution-logo"><img src={iitKanpurLogo} alt="IIT Kanpur logo" /></div><span>INDIAN INSTITUTE OF TECHNOLOGY<br/><strong>KANPUR</strong></span></div><div className="institution-mark"><div className="institution-logo"><img src={manitBhopalLogo} alt="MANIT Bhopal logo" /></div><span>MAULANA AZAD NATIONAL INSTITUTE OF TECHNOLOGY<br/><strong>BHOPAL</strong></span></div></div></div></Reveal>
 
-    <Reveal className="chapter build" id="iks"><div className="chapter-heading"><p className="eyebrow">03 / WHY IKS</p><p>IDEAS THAT STILL SPEAK</p></div><div className="build-grid"><div><h2>Old wisdom,<br/><i>new questions.</i></h2><p>Indian Knowledge Systems are the many ways people in India have studied, understood, recorded, and passed on knowledge across generations. Our books explore mathematics, astronomy, ecology, medicine, philosophy, literature, architecture, and the arts.</p><a className="text-link" href="#contact">EXPLORE A TOPIC <Arrow /></a></div><BuildField /></div></Reveal>
+    <Reveal className="chapter build" id="iks"><div className="chapter-heading"><p className="eyebrow">04 / WHY IKS</p><p>IDEAS THAT STILL SPEAK</p></div><div className="build-grid"><div><h2>Old wisdom,<br/><i>new questions.</i></h2><p>Indian Knowledge Systems are the many ways people in India have studied, understood, recorded, and passed on knowledge across generations. Our books explore mathematics, astronomy, ecology, medicine, philosophy, literature, architecture, and the arts.</p><a className="text-link" href="#contact">EXPLORE A TOPIC <Arrow /></a></div><BuildField /></div>
+      <div className="marquee marquee--alt" aria-hidden="true"><span>GANITA · AKASHA · BHUMI · SHABDA · KALA · VEDA ·&nbsp;</span><span>GANITA · AKASHA · BHUMI · SHABDA · KALA · VEDA ·&nbsp;</span></div></Reveal>
 
-    <Reveal className="contact" id="contact"><p className="eyebrow">A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons" role="radiogroup" aria-label="What brings you here?">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button role="radio" aria-checked={topic === x} className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href={`mailto:hello@adverkey.com?subject=${encodeURIComponent(topic + ' — Adverkey Studios enquiry')}`}>START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
+    <Reveal className="contact" id="contact"><p className="eyebrow">05 / A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons" role="radiogroup" aria-label="What brings you here?">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button role="radio" aria-checked={topic === x} className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href={`mailto:hello@adverkey.com?subject=${encodeURIComponent(topic + ' — Adverkey Studios enquiry')}`}>START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
     <footer><a className="wordmark" href="#top">ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer>
   </main>
 }

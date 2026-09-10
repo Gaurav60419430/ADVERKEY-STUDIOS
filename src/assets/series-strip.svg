@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2172" height="420" viewBox="0 0 2172 420" role="img" aria-label="Names of the IKS series: Ganita, Akasha, Bhumi, Shabda, Kala, Veda">
+  <rect width="2172" height="420" fill="#f1efe9"/>
+  <rect x="0" y="18" width="2172" height="3" fill="#c9c1ac"/>
+  <rect x="0" y="399" width="2172" height="3" fill="#c9c1ac"/>
+  <text x="60" y="70" font-family="'DM Mono', monospace" font-size="28" letter-spacing="8" fill="#b3ab95">IKS SERIES · 01–06</text>
+  <text x="1086" y="212" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="132" letter-spacing="10" fill="#cfc7b2" textLength="1980" lengthAdjust="spacingAndGlyphs">GANITA · AKASHA · BHUMI ·</text>
+  <text x="1086" y="348" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="132" letter-spacing="10" fill="#d5aca2" textLength="1980" lengthAdjust="spacingAndGlyphs">SHABDA · KALA · VEDA ·</text>
+</svg>
