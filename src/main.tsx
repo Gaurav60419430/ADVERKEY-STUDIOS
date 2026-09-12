@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 import './iks.css'
@@ -62,8 +62,8 @@ function HeroTitle() {
     hero.addEventListener('pointerleave', leave)
     return () => { if (raf) cancelAnimationFrame(raf); hero.removeEventListener('pointermove', move); hero.removeEventListener('pointerleave', leave) }
   }, [])
-  const line = (text: string) => text.split('').map((ch, i) => <span key={i} className="hero-char">{ch === ' ' ? ' ' : ch}</span>)
-  return <h1 id="hero-title" ref={ref}><span className="hero-line">{line('LEARN')}</span><span className="hero-line">{line('FROM OUR')}</span><span className="hero-line">{line('ROOTS.')}</span></h1>
+  const line = (text: string, base: number) => text.split('').map((ch, i) => <span key={i} className="hero-char" style={{ '--d': `${base + i * 30}ms` } as CSSProperties}>{ch === ' ' ? ' ' : ch}</span>)
+  return <h1 id="hero-title" ref={ref}><span className="hero-line">{line('LEARN', 350)}</span><span className="hero-line">{line('FROM OUR', 470)}</span><span className="hero-line">{line('ROOTS.', 590)}</span></h1>
 }
 
 function Reveal({ children, className = '', id }: { children: ReactNode, className?: string, id?: string }) {
@@ -164,7 +164,7 @@ function Catalogue({ onBack }: { onBack: () => void }) {
       <button className="text-link" onClick={onBack}>← BACK TO HOME</button>
     </div>
     <div className="catalogue-grid">
-      {books.map(b => <div key={b.id} className="catalogue-card">
+      {books.map((b, i) => <div key={b.id} className="catalogue-card" style={{ '--d': `${Math.min(i, 8) * 70}ms` } as CSSProperties}>
         <div className="catalogue-cover" style={isImage(b.cover) ? { backgroundImage: `url(${b.cover})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : { background: b.cover || '#e34f33', color: b.color }}>
           {!isImage(b.cover) && <><span className="sun">✺</span><em>{b.kicker}</em><strong style={{ whiteSpace: 'pre-line' }}>{b.title}</strong><small>{b.subtitle}</small></>}
         </div>
@@ -193,11 +193,80 @@ function BuildField() {
   return <div ref={field} className={`field aryabhata-field${armed ? ' is-armed' : ''}`} onClick={() => setArmed(!armed)} onPointerMove={move} onPointerLeave={() => { field.current?.style.setProperty('--pointer-x', '0'); field.current?.style.setProperty('--pointer-y', '0') }} aria-label="Animated halftone portrait of Aryabhata, an Indian mathematician and astronomer. Point at or click the portrait to trigger the red eyes."><img src="/aryabhata.jpg" alt="Aryabhata surrounded by the Sun, Earth, and stars" /><span className="aryabhata-scan" aria-hidden="true"></span><span className="aryabhata-eye aryabhata-eye-left" aria-hidden="true"></span><span className="aryabhata-eye aryabhata-eye-right" aria-hidden="true"></span><span className="aryabhata-dots" aria-hidden="true"></span><div className="field-label">ARYABHATA / MATHEMATICS,<br/>ASTRONOMY, AND THE SKY</div></div>
 }
 
+let loaderShown = false
+
+function Loader() {
+  const [gone, setGone] = useState(false)
+  useEffect(() => {
+    if (loaderShown || document.readyState === 'complete') { loaderShown = true; setGone(true); return }
+    loaderShown = true
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setGone(true); return }
+    const t1 = window.setTimeout(() => { document.querySelector('.loader')?.classList.add('is-done') }, 650)
+    const t2 = window.setTimeout(() => setGone(true), 1450)
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2) }
+  }, [])
+  if (gone) return null
+  return <div className="loader" aria-hidden="true"><p>ADVERKEY<span>STUDIOS</span></p><small>RESEARCH · READING · RENEWAL</small></div>
+}
+
+function Cursor() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return
+    let x = -100, y = -100, tx = -100, ty = -100, raf = 0, hot = false
+    const loop = () => {
+      x += (tx - x) * .2; y += (ty - y) * .2
+      el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${hot ? 2.4 : 1})`
+      raf = requestAnimationFrame(loop)
+    }
+    const move = (e: PointerEvent) => { tx = e.clientX; ty = e.clientY }
+    const over = (e: Event) => { hot = (e.target as HTMLElement).closest('a,button,[role="button"]') != null }
+    window.addEventListener('pointermove', move, { passive: true })
+    window.addEventListener('pointerover', over, { passive: true })
+    raf = requestAnimationFrame(loop)
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('pointermove', move); window.removeEventListener('pointerover', over) }
+  }, [])
+  return <div ref={ref} className="cursor" aria-hidden="true"></div>
+}
+
 function App() {
   const [stage, setStage] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const heroRef = useRef<HTMLElement>(null)
   const [topic, setTopic] = useState('WANT TO PUBLISH A BOOK')
   const [view, setView] = useState<'home' | 'catalogue'>(() => (typeof location !== 'undefined' && location.hash === '#catalogue' ? 'catalogue' : 'home'))
   useEffect(() => { document.documentElement.style.setProperty('--stage', String(stage)) }, [stage])
+  useEffect(() => { // process auto-advance, paused on hover/focus
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || paused) return
+    const id = window.setInterval(() => setStage(s => (s + 1) % 5), 4200)
+    return () => window.clearInterval(id)
+  }, [paused])
+  useEffect(() => { // hero scroll parallax via --sy (translate property, composes with transforms)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let raf = 0
+    const update = () => { raf = 0; heroRef.current?.style.setProperty('--sy', String(window.scrollY)) }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => { window.removeEventListener('scroll', onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [view])
+  useEffect(() => { // magnetic pull for tagged elements (fine pointers only)
+    if (view !== 'home' || window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return
+    const els = Array.from(document.querySelectorAll('[data-magnetic]')) as HTMLElement[]
+    const cleanups = els.map(el => {
+      const move = (e: PointerEvent) => {
+        const r = el.getBoundingClientRect()
+        el.style.setProperty('--mx', `${((e.clientX - (r.left + r.width / 2)) / r.width * 14).toFixed(1)}px`)
+        el.style.setProperty('--my', `${((e.clientY - (r.top + r.height / 2)) / r.height * 14).toFixed(1)}px`)
+      }
+      const leave = () => { el.style.setProperty('--mx', '0px'); el.style.setProperty('--my', '0px') }
+      el.addEventListener('pointermove', move)
+      el.addEventListener('pointerleave', leave)
+      return () => { el.removeEventListener('pointermove', move); el.removeEventListener('pointerleave', leave) }
+    })
+    return () => cleanups.forEach(fn => fn())
+  }, [view])
   useEffect(() => {
     const onHash = () => setView(location.hash === '#catalogue' ? 'catalogue' : 'home')
     window.addEventListener('hashchange', onHash)
@@ -212,17 +281,19 @@ function App() {
   const goCatalogue = () => { location.hash = '#catalogue'; setView('catalogue'); window.scrollTo(0, 0) }
   const goHome = () => { history.pushState('', document.title, window.location.pathname + window.location.search); setView('home'); window.scrollTo(0, 0) }
   if (view === 'catalogue') return <main id="top"><ScrollProgress /><Header /><div className="catalogue-wrap"><Catalogue onBack={goHome} /></div><footer><a className="wordmark" href="#top" onClick={e => { e.preventDefault(); goHome() }}>ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer></main>
-  return <main id="top">
+  return <>
+    <Loader /><Cursor />
+    <main id="top">
     <ScrollProgress />
     <Header />
-    <section className="hero" aria-labelledby="hero-title">
+    <section ref={heroRef} className="hero" aria-labelledby="hero-title">
       <div className="hero-covers" aria-hidden="true">
         <div className="cover-track cover-track-forward"><i></i><i></i></div>
         <div className="cover-track cover-track-reverse"><i></i><i></i></div>
       </div>
       <div className="hero-index">001 / RESEARCH-LED PUBLISHING</div>
       <HeroTitle />
-      <div className="hero-bottom"><p>Adverkey Studios turns research, scholarship, and living traditions into books for the next generation.</p><a href="#books" className="circle-link" aria-label="Explore our books">↓</a><p className="hero-note">IKS / RESEARCH / LEARNING</p></div>
+      <div className="hero-bottom"><p>Adverkey Studios turns research, scholarship, and living traditions into books for the next generation.</p><a href="#books" className="circle-link" data-magnetic aria-label="Explore our books">↓</a><p className="hero-note">IKS / RESEARCH / LEARNING</p></div>
       <HeroBook />
     </section>
 
@@ -235,16 +306,16 @@ function App() {
       <div className="marquee"><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span><span>ROOTED IN RESEARCH · MADE FOR THE NEXT GENERATION</span></div>
     </Reveal>
 
-    <Reveal className="process" id="method"><div className="process-head"><p className="eyebrow">02 / FROM SOURCE TO LAST PAGE</p><h2>Research becomes<br/><i>a reading journey.</i></h2></div><div className="stages" role="tablist" aria-label="Our publishing process">{[['01','SOURCE','Research papers, texts, and knowledge traditions.'],['02','VERIFY','Academic review, source checking, and editorial care.'],['03','TRANSLATE','Complex ideas made clear, vivid, and age-appropriate.'],['04','DESIGN','Illustrations, structure, and visual learning that invite attention.'],['05','PUBLISH','Books made for classrooms, homes, and independent reading.']].map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {['SOURCE','VERIFY','TRANSLATE','DESIGN','PUBLISH'][stage]} </span><div className="page page-a"></div><div className="page page-b"></div><div className="ink">{stage === 0 ? 'ॐ' : stage === 1 ? '∴' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
+    <Reveal className="process" id="method"><div className="process-head"><p className="eyebrow">02 / FROM SOURCE TO LAST PAGE</p><h2>Research becomes<br/><i>a reading journey.</i></h2></div><div className="stages" role="tablist" aria-label="Our publishing process" onPointerEnter={() => setPaused(true)} onPointerLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>{[['01','SOURCE','Research papers, texts, and knowledge traditions.'],['02','VERIFY','Academic review, source checking, and editorial care.'],['03','TRANSLATE','Complex ideas made clear, vivid, and age-appropriate.'],['04','DESIGN','Illustrations, structure, and visual learning that invite attention.'],['05','PUBLISH','Books made for classrooms, homes, and independent reading.']].map(([number,title,description], i) => <button key={title} className={i === stage ? 'stage current' : 'stage'} onClick={() => setStage(i)} role="tab" aria-selected={i === stage}><span>{number}</span><b>{title}</b><p>{description}</p><i>↘</i></button>)}</div><div className={`process-art process-stage-${stage}`}><span> {['SOURCE','VERIFY','TRANSLATE','DESIGN','PUBLISH'][stage]} </span><div className="page page-a"></div><div className="page page-b"></div><div key={stage} className="ink ink-pop">{stage === 0 ? 'ॐ' : stage === 1 ? '∴' : stage === 2 ? '✹' : stage === 3 ? '▤' : '✦'}</div></div></Reveal>
 
     <Reveal className="chapter back" id="trust"><div className="chapter-heading"><p className="eyebrow">03 / TRUSTED SOURCES</p><p>ACADEMIC COLLABORATION</p></div><div className="back-grid"><h2>Knowledge with<br/><i>a foundation.</i></h2><div className="back-copy"><p>We work with contributors from academic and research communities, including relationships connected to IIT Kanpur and MANIT Bhopal. Their research and source material help give our books a strong foundation.</p><p className="muted">These institutions represent contributor and research relationships, not an institutional endorsement of Adverkey Studios or its publications.</p><a className="text-link light" href="#contact">COLLABORATE WITH US <Arrow /></a></div><div className="institutions" aria-label="Trusted partners connected to our contributors"><p>TRUSTED PARTNERS</p><div className="institution-mark"><div className="institution-logo"><img src={iitKanpurLogo} alt="IIT Kanpur logo" /></div><span>INDIAN INSTITUTE OF TECHNOLOGY<br/><strong>KANPUR</strong></span></div><div className="institution-mark"><div className="institution-logo"><img src={manitBhopalLogo} alt="MANIT Bhopal logo" /></div><span>MAULANA AZAD NATIONAL INSTITUTE OF TECHNOLOGY<br/><strong>BHOPAL</strong></span></div></div></div></Reveal>
 
     <Reveal className="chapter build" id="iks"><div className="chapter-heading"><p className="eyebrow">04 / WHY IKS</p><p>IDEAS THAT STILL SPEAK</p></div><div className="build-grid"><div><h2>Old wisdom,<br/><i>new questions.</i></h2><p>Indian Knowledge Systems are the many ways people in India have studied, understood, recorded, and passed on knowledge across generations. Our books explore mathematics, astronomy, ecology, medicine, philosophy, literature, architecture, and the arts.</p><a className="text-link" href="#contact">EXPLORE A TOPIC <Arrow /></a></div><BuildField /></div>
       <div className="marquee marquee--alt" aria-hidden="true"><span>GANITA · AKASHA · BHUMI · SHABDA · KALA · VEDA ·&nbsp;</span><span>GANITA · AKASHA · BHUMI · SHABDA · KALA · VEDA ·&nbsp;</span></div></Reveal>
 
-    <Reveal className="contact" id="contact"><p className="eyebrow">05 / A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons" role="radiogroup" aria-label="What brings you here?">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button role="radio" aria-checked={topic === x} className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" href={`mailto:hello@adverkey.com?subject=${encodeURIComponent(topic + ' — Adverkey Studios enquiry')}`}>START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
+    <Reveal className="contact" id="contact"><p className="eyebrow">05 / A GOOD PLACE TO START</p><h2>Let’s make<br/><i>knowledge travel.</i></h2><div className="topic-buttons" role="radiogroup" aria-label="What brings you here?">{['HAVE RESEARCH TO SHARE','WANT TO PUBLISH A BOOK','NEED LEARNING CONTENT','WANT TO COLLABORATE'].map(x => <button role="radio" aria-checked={topic === x} className={topic === x ? 'chosen' : ''} key={x} onClick={() => setTopic(x)}>{x}<Arrow /></button>)}</div><a className="contact-email" data-magnetic href={`mailto:hello@adverkey.com?subject=${encodeURIComponent(topic + ' — Adverkey Studios enquiry')}`}>START A PUBLISHING CONVERSATION<br/>hello@adverkey.com</a></Reveal>
     <footer><a className="wordmark" href="#top">ADVERKEY<span>STUDIOS</span></a><p>RESEARCH · READING · RENEWAL</p><p>© 2026 ADVERKEY STUDIOS. ALL RIGHTS RESERVED.</p></footer>
   </main>
-}
+  </>}
 
 createRoot(document.getElementById('root')!).render(<App />)

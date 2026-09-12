@@ -35,3 +35,52 @@ body::after{content:'';position:fixed;inset:0;z-index:200;pointer-events:none;op
   .header:has(.nav.open) .wordmark,.header:has(.nav.open) .menu{position:relative;z-index:41;color:var(--paper)}
   .header:has(.nav.open) .menu i{background:var(--paper)}
 }
+
+/* ---- Motion layer (animation-only; no layout changes) ---- */
+
+/* Custom cursor (fine pointers only; native cursor hidden there). */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) { body, a, button, label, [role="button"] { cursor: none } }
+.cursor { position: fixed; left: 0; top: 0; z-index: 300; pointer-events: none; will-change: transform }
+.cursor::after { content: ''; display: block; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--red) }
+
+/* Loader curtain (plays once per page load). */
+.loader { position: fixed; inset: 0; z-index: 400; background: var(--ink); color: var(--paper); display: grid; place-content: center; justify-items: center; gap: .8rem; transition: opacity .6s var(--ease), visibility .6s }
+.loader p { font-size: 1.55rem; letter-spacing: -.11em; font-weight: 600; margin: 0; animation: loader-rise .7s var(--ease) both }
+.loader p span { font: 8px var(--mono); vertical-align: top; margin-left: 4px; letter-spacing: .05em }
+.loader small { font: 10px var(--mono); letter-spacing: .1em; opacity: .7; animation: loader-rise .7s 120ms var(--ease) both }
+.loader::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: var(--red); transform-origin: left; animation: loader-bar 650ms var(--ease) both }
+.loader.is-done { opacity: 0; visibility: hidden }
+@keyframes loader-rise { from { opacity: 0; transform: translateY(16px) } }
+@keyframes loader-bar { from { transform: scaleX(0) } }
+
+/* Hero headline: staggered per-character rise (backwards fill so the
+   pointer-repel inline transform keeps working after entrance).
+   !important is required: styles.css disables char animation with its own
+   !important, and this layer loads last to win. */
+.hero h1 .hero-char { animation: hero-rise .9s var(--ease) backwards !important; animation-delay: var(--d, 0ms) !important }
+@keyframes hero-rise { from { opacity: 0; transform: translateY(.55em) rotate(4deg) } }
+
+/* Hero scroll parallax ( unitless --sy set from JS; translate composes with transforms). */
+.hero h1 { translate: 0 calc(var(--sy, 0) * -.06px) }
+.hero-covers { translate: 0 calc(var(--sy, 0) * .1px) }
+.hero-book-tilt { translate: 0 calc(var(--sy, 0) * -.12px) }
+.hero-bottom { translate: 0 calc(var(--sy, 0) * -.03px) }
+
+/* Magnetic elements ease toward the pointer, spring back on leave. */
+[data-magnetic] { translate: var(--mx, 0px) var(--my, 0px); transition: translate .35s var(--ease) }
+.circle-link[data-magnetic] { transition: background .3s, color .3s, translate .35s var(--ease) }
+
+/* Process symbol pops when the stage changes (remounted via key). */
+.ink-pop { animation: ink-pop .7s var(--ease) }
+@keyframes ink-pop { 0% { opacity: 0; transform: translateY(26px) scale(.94) } 60% { opacity: 1 } }
+
+/* Catalogue cards cascade in. */
+.catalogue-card { animation: card-in .7s var(--ease) backwards; animation-delay: var(--d, 0ms) }
+@keyframes card-in { from { opacity: 0; transform: translateY(26px) scale(.98) } }
+
+@media (pointer: coarse) { .cursor { display: none } }
+@media (prefers-reduced-motion: reduce) {
+  .cursor, .loader { display: none }
+  .hero h1 .hero-char, .ink-pop, .catalogue-card { animation: none !important }
+  .hero h1, .hero-covers, .hero-book-tilt, .hero-bottom, [data-magnetic] { translate: 0 0 }
+}
