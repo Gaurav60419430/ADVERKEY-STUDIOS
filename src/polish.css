@@ -1,0 +1,86 @@
+/* Aesthetic pass: texture, polish, mobile nav, progress. Loaded last so it wins ties. */
+::selection{background:var(--red);color:var(--paper)}
+
+/* Paper grain over everything (non-interactive print texture). */
+body::after{content:'';position:fixed;inset:0;z-index:200;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* Gentle tonal shifts so long scrolls breathe between bold chapters. */
+.manifesto{background:#eae4d3}
+.process{background:#e6e1d1}
+
+/* The typographic series strip is drawn close to paper tone so it reads as
+   texture, not a competing headline; the photo track keeps full presence. */
+.cover-track-forward{opacity:.5}
+
+/* Scroll progress hairline. */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;width:100%;background:var(--red);transform:scaleX(0);transform-origin:left;z-index:120}
+
+/* Topic pills get the same underline-hover as text links. */
+.topic-buttons button{position:relative}
+.topic-buttons button::after{content:'';position:absolute;left:12px;right:12px;bottom:12px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.topic-buttons button:hover::after{transform:scaleX(1)}
+.topic-buttons .chosen::after{display:none}
+
+/* Second marquee bridging the IKS chapter into contact. */
+.marquee--alt{border-bottom:1px solid rgba(29,29,27,.5)}
+
+@media(max-width:720px){
+  /* Dock the hero book clear of the headline on small screens. */
+  .hero-book-tilt{right:-6vw;top:auto;bottom:7%}
+  .hero-book--closed{--book-scale:.58;right:auto;top:auto}
+  .hero-book-tilt .hero-book{transform-origin:bottom right}
+  /* Full-screen ink navigation overlay with large serif links. */
+  .nav.open{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;justify-content:center;gap:1.4rem;padding:0 var(--gutter);background:var(--ink);color:var(--paper);font:500 clamp(2.6rem,11vw,4.2rem)/1 var(--display);letter-spacing:-.05em;border:0}
+  .nav.open a{width:max-content}
+  .header:has(.nav.open) .wordmark,.header:has(.nav.open) .menu{position:relative;z-index:41;color:var(--paper)}
+  .header:has(.nav.open) .menu i{background:var(--paper)}
+}
+
+/* ---- Motion layer (animation-only; no layout changes) ---- */
+
+/* Custom cursor (fine pointers only; native cursor hidden there). */
+@media (pointer: fine) and (prefers-reduced-motion: no-preference) { body, a, button, label, [role="button"] { cursor: none } }
+.cursor { position: fixed; left: 0; top: 0; z-index: 300; pointer-events: none; will-change: transform }
+.cursor::after { content: ''; display: block; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--red) }
+
+/* Loader curtain (plays once per page load). */
+.loader { position: fixed; inset: 0; z-index: 400; background: var(--ink); color: var(--paper); display: grid; place-content: center; justify-items: center; gap: .8rem; transition: opacity .6s var(--ease), visibility .6s }
+.loader p { font-size: 1.55rem; letter-spacing: -.11em; font-weight: 600; margin: 0; animation: loader-rise .7s var(--ease) both }
+.loader p span { font: 8px var(--mono); vertical-align: top; margin-left: 4px; letter-spacing: .05em }
+.loader small { font: 10px var(--mono); letter-spacing: .1em; opacity: .7; animation: loader-rise .7s 120ms var(--ease) both }
+.loader::after { content: ''; position: absolute; bottom: 0; left: 0; height: 3px; width: 100%; background: var(--red); transform-origin: left; animation: loader-bar 650ms var(--ease) both }
+.loader.is-done { opacity: 0; visibility: hidden }
+@keyframes loader-rise { from { opacity: 0; transform: translateY(16px) } }
+@keyframes loader-bar { from { transform: scaleX(0) } }
+
+/* Hero headline: staggered per-character rise (backwards fill so the
+   pointer-repel inline transform keeps working after entrance).
+   !important is required: styles.css disables char animation with its own
+   !important, and this layer loads last to win. */
+.hero h1 .hero-char { animation: hero-rise .9s var(--ease) backwards !important; animation-delay: var(--d, 0ms) !important }
+@keyframes hero-rise { from { opacity: 0; transform: translateY(.55em) rotate(4deg) } }
+
+/* Hero scroll parallax ( unitless --sy set from JS; translate composes with transforms). */
+.hero h1 { translate: 0 calc(var(--sy, 0) * -.06px) }
+.hero-covers { translate: 0 calc(var(--sy, 0) * .1px) }
+.hero-book-tilt { translate: 0 calc(var(--sy, 0) * -.12px) }
+.hero-bottom { translate: 0 calc(var(--sy, 0) * -.03px) }
+
+/* Magnetic elements ease toward the pointer, spring back on leave. */
+[data-magnetic] { translate: var(--mx, 0px) var(--my, 0px); transition: translate .35s var(--ease) }
+.circle-link[data-magnetic] { transition: background .3s, color .3s, translate .35s var(--ease) }
+
+/* Process symbol pops when the stage changes (remounted via key). */
+.ink-pop { animation: ink-pop .7s var(--ease) }
+@keyframes ink-pop { 0% { opacity: 0; transform: translateY(26px) scale(.94) } 60% { opacity: 1 } }
+
+/* Catalogue cards cascade in. */
+.catalogue-card { animation: card-in .7s var(--ease) backwards; animation-delay: var(--d, 0ms) }
+@keyframes card-in { from { opacity: 0; transform: translateY(26px) scale(.98) } }
+
+@media (pointer: coarse) { .cursor { display: none } }
+@media (prefers-reduced-motion: reduce) {
+  .cursor, .loader { display: none }
+  .hero h1 .hero-char, .ink-pop, .catalogue-card { animation: none !important }
+  .hero h1, .hero-covers, .hero-book-tilt, .hero-bottom, [data-magnetic] { translate: 0 0 }
+}

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="900" viewBox="0 0 600 900" role="img" aria-label="Proposed book cover: Akasha, reading the night sky">
+  <rect width="600" height="900" fill="#172b46"/>
+  <g stroke="#d0e5e0" stroke-width="2" opacity=".8">
+    <line x1="120" y1="250" x2="240" y2="180"/>
+    <line x1="240" y1="180" x2="360" y2="260"/>
+    <line x1="360" y1="260" x2="470" y2="180"/>
+    <line x1="240" y1="180" x2="300" y2="330"/>
+  </g>
+  <g fill="#f1efe9">
+    <circle cx="120" cy="250" r="7"/><circle cx="240" cy="180" r="9"/><circle cx="360" cy="260" r="7"/><circle cx="470" cy="180" r="6"/><circle cx="300" cy="330" r="7"/>
+    <circle cx="170" cy="420" r="3" opacity=".6"/><circle cx="430" cy="400" r="3" opacity=".6"/><circle cx="350" cy="120" r="3" opacity=".6"/>
+  </g>
+  <text x="300" y="300" text-anchor="middle" font-size="72" fill="#e7a664">✦</text>
+  <text x="52" y="86" font-family="monospace" font-size="20" letter-spacing="3" fill="#d0e5e0">02 / AKASHA</text>
+  <text x="52" y="640" font-family="Georgia, serif" font-size="86" font-weight="600" letter-spacing="-2" fill="#f1efe9">Read the</text>
+  <text x="52" y="730" font-family="Georgia, serif" font-style="italic" font-size="72" fill="#e7a664">night sky like</text>
+  <text x="52" y="805" font-family="Georgia, serif" font-style="italic" font-size="72" fill="#e7a664">a manuscript.</text>
+  <text x="52" y="852" font-family="monospace" font-size="16" letter-spacing="2" fill="#f1efe9" opacity=".7">ADVERKEY PRESS · ASTRONOMY</text>
+</svg>
